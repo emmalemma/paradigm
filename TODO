@@ -1,0 +1,5 @@
+- CLIENT SIDE TEMPLATING
+
+- minify JS being sent to the client (try UglifyJS, is node)
+- recursive template parsing
+- saying "Done!" is massively deceptive

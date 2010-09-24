@@ -1,7 +1,7 @@
 fs = require 'fs'
 
 server_output = "server-routes.coffee"
-client_output = "client-routes.js"
+client_output = "client-routes.coffee"
 
 open_files = 0
 
@@ -43,7 +43,7 @@ handled_file = () ->
         
 
 client_side_code = () ->
-    code = "$call = (function_name, args) -> jQuery.post('/$/#function_name', args, $callback, 'json')\n"
+    code = "$call = (function_name, args) -> jQuery.post('/$/'+function_name, JSON.stringify(args or {}), $callback, 'json')\n"
     code += "$callback = (data, status, request) -> console.log data \n"
     for f in shared_functions
         code += "$#{f} = (args...) -> $call('#{f}', args)\n"

@@ -1,0 +1,1 @@
+this.$datatoprint = (data) -> {data: "Server speaking", callback: "insert", where: "data.where"}
