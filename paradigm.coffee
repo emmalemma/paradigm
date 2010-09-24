@@ -40,10 +40,10 @@ route_shared_functions =->
         if i[0] == '$'
             log "#{i}"
             routed_funcs[i] = server_code[i]
-    fs.readFile 'shared_cs/client-routes.coffee', 'utf8', (err, data) -> #this could also work better
-        fout = data.replace("{%%}", JSON.stringify(routed_funcs['$routed_functions']()))
-        fs.writeFile 'shared_cs/client-routes.tmp', fout, 'utf8', (err) ->
-            cp.exec "coffee -c -o #{CLIENT_JS_DIR} --no-wrap shared_cs/client-routes.tmp"
+    fs.readFile 'client_cs/paradigm.coffee', 'utf8', (err, data) -> #this could also work better
+        fout = data.replace("{%ROUTED_FUNCS%}", JSON.stringify(routed_funcs['$routed_functions']()))
+        fs.writeFile 'client_cs/paradigm.tmp', fout, 'utf8', (err) ->
+            cp.exec "coffee -c -o #{CLIENT_JS_DIR} --no-wrap client_cs/paradigm.tmp"
     log "Done!"
     
 compile_clientside_scripts =->

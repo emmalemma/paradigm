@@ -8,6 +8,7 @@ later:
 - minify JS being sent to the client (try UglifyJS, is node)
 - recursive template parsing
 - saying "Done!" is massively deceptive
+- use coffeescript compiler library for compilation instead of command-line
 
 much later:
 - parse template files for shared functions
@@ -16,5 +17,6 @@ much later:
     - issues a client-side hook that watches the server for updates and refreshes
     - doesn't compile client-side code, issues a client-side cs compiler instead
     - (or just doesn't minify)
+    - uses paperboy to serve static files
     - ...
 - hold template files in memory, remove paperboy except in dev

@@ -7,7 +7,7 @@ $callback = (data, status, request) ->
 
 insert =(data)-> console.log data
 
-routed_functions = {%%}
+routed_functions = {%ROUTED_FUNCS%}
 
 for f in routed_functions
     window[f] = (args...) -> $call("#{f}", args)
