@@ -1,5 +1,13 @@
-- CLIENT SIDE TEMPLATING
+To do:
 
+now:
+- client side templating
+- DB support: client and server interfaces. Couch to start?
+
+later:
 - minify JS being sent to the client (try UglifyJS, is node)
 - recursive template parsing
 - saying "Done!" is massively deceptive
+
+much later:
+- parse template files for shared functions
