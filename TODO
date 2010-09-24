@@ -11,3 +11,10 @@ later:
 
 much later:
 - parse template files for shared functions
+- add a dev environment that:
+    - watches the server files and reloads them automatically
+    - issues a client-side hook that watches the server for updates and refreshes
+    - doesn't compile client-side code, issues a client-side cs compiler instead
+    - (or just doesn't minify)
+    - ...
+- hold template files in memory, remove paperboy except in dev
