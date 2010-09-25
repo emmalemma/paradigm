@@ -9,17 +9,18 @@ paperboy = require './lib/paperboy'
 
 #CONFIG
 #Example:
-PORT = 8007
-#these do not seem to be absolute here...
-PRIVATE_DIR = path.join path.dirname(__filename), 'example/private'
-PUBLIC_DIR = path.join path.dirname(__filename), 'example/public'
-CLIENT_CS_DIR = path.join path.dirname(__filename), 'example/private/cs/'
-CLIENT_JS_DIR = path.join path.dirname(__filename), 'example/public/js/'
-SERVER_CODE = "./example/secret"
+Config = 
+	port: 8007
+	#these do not seem to be absolute here...
+	private_dir: path.join path.dirname(__filename), 'example/private'
+	public_dir: path.join path.dirname(__filename), 'example/public'
+	client_cs_dir: path.join path.dirname(__filename), 'example/private/cs/'
+	client_js_dir: path.join path.dirname(__filename), 'example/public/js/'
+	server_code: "./example/secret"
 
 #GLOBALS
 
-server_code = require SERVER_CODE
+server_code = require Config.server_code
 
 routed_funcs = []
 
@@ -44,23 +45,23 @@ route_shared_functions =->
 	fs.readFile 'client_cs/paradigm.coffee', 'utf8', (err, data) -> #this could also work better
 		fout = data.replace("{%ROUTED_FUNCS%}", JSON.stringify(routed_funcs['$routed_functions']()))
 		fs.writeFile 'client_cs/paradigm.tmp', fout, 'utf8', (err) ->
-			cp.exec "coffee -c -o #{CLIENT_JS_DIR} --no-wrap client_cs/paradigm.tmp && rm client_cs/paradigm.tmp"
+			cp.exec "coffee -c -o #{Config.client_js_dir} --no-wrap client_cs/paradigm.tmp && rm client_cs/paradigm.tmp"
 	log "Done!"
 	
 compile_clientside_scripts =->
 	print "Compiling client-side coffeescripts into js... "
-	cp.exec "cd #{CLIENT_CS_DIR} && coffee -c -o #{CLIENT_JS_DIR} --no-wrap ."
+	cp.exec "cd #{Config.client_cs_dir} && coffee -c -o #{Config.client_js_dir} --no-wrap ."
 	log "Done!"
 	
 parse_templates =->
 	print "Parsing templates... "
 	parse_dir = (dir) ->
-		fs.readdir path.join(PRIVATE_DIR, dir), (err, files) ->
+		fs.readdir path.join(Config.private_dir, dir), (err, files) ->
 			for f in files
 				code = ""
-				fs.readFile path.join(PRIVATE_DIR, dir, f), 'utf8', (err, data) ->
+				fs.readFile path.join(Config.private_dir, dir, f), 'utf8', (err, data) ->
 				
-					fs.mkdir path.join(PUBLIC_DIR, dir), 493
+					fs.mkdir path.join(Config.public_dir, dir), 493
 				
 					if not data #this probably means it's a directory...
 						return parse_dir path.join(dir, f)
@@ -68,18 +69,24 @@ parse_templates =->
 					if not f.match /.*\.html/
 						return
 						
-					i = 0
-					while data.match "{="
-						k = "#{(i+=1).toString(36)}"
-						data = data.replace "{=", "<div id='#{k}'></div>{%_where='#{k}'\n"
-					data = data.replace /=}/g, "%}"
+					#match target tags (new way)
+					while m = data.match /{= *(.+) *=}/
+						data = data.replace m[0], "<div id='#{m[1]}'></div>"
+					
+					#match target tags (old way)
+					# i = 0
+					# while data.match "{="
+					# 	k = "#{(i+=1).toString(36)}"
+					# 	data = data.replace "{=", "<div id='#{k}'></div>{%_where='#{k}'\n"
+					# data = data.replace /=}/g, "%}"
+					
 					
 					blocks = data.split("{%")
 					code = ""
 					for block in blocks
 						[a,b] = block.split "%}"
 						code += ("<script>#{unwrapped_cs(a)}</script>#{b}" if b) or a
-					fs.writeFile path.join(PUBLIC_DIR, dir, f), code, 'utf8', (err)->log err if err
+					fs.writeFile path.join(Config.public_dir, dir, f), code, 'utf8', (err)->log err if err
 					
 					
 	parse_dir ''
@@ -120,7 +127,7 @@ route_function_call = (req, res) ->
 		else
 			return_data = rfunc(parsed_data._data...)
 		
-		res.end JSON.stringify( {_data: return_data, _callback: parsed_data._callback or "_callback", _where: parsed_data._where or "_" })
+		res.end JSON.stringify( {_data: return_data, _callback: parsed_data._callback or null, _where: parsed_data._where or null })
 	
 	if req.method == "POST"
 		req.on 'data', finish
@@ -131,7 +138,7 @@ route_function_call = (req, res) ->
 	return true
   
 deliver_paperboy = (req, res, ip) -> 
-	pb = paperboy.deliver(PUBLIC_DIR, req, res)
+	pb = paperboy.deliver(Config.public_dir, req, res)
 	pb = pb.addHeader 'Expires', 300
 	pb = pb.addHeader 'X-PaperRoute', 'Node'
 	pb = pb.before () -> sys.log 'Received Request'
@@ -146,10 +153,16 @@ deliver_paperboy = (req, res, ip) ->
 			res.end()
 			log(statCode, req.url, ip, err)
 			
-			
+
+issue = (file) ->
+	cp.exec("cp #{file} #{path.join Config.client_js_dir, path.basename(file)}")
+
 route_shared_functions()
 compile_clientside_scripts()
 parse_templates()
-print "Starting listener on port #{PORT}... "
-server.listen PORT
+
+issue 'lib/mootools.js'
+
+print "Starting listener on port #{Config.port}... "
+server.listen Config.port
 log "Listening."

@@ -1,18 +1,17 @@
 <html>
 <head>
-<script src='http://mootools.net/download/get/mootools-1.2.5-core-yc.js'> </script>
+<script src='js/mootools.js'> </script>
 <script src="js/paradigm.js"> </script>
 </head>
 <body> 
-	{=$randomfloat(_callback:'text')=}
-	{=$randomfloat(_callback:'text')=}
-	{=$randomfloat(_callback:'text')=}
-	{=$randomfloat(_callback:'text')=}
-	{=$randomfloat(_callback:'text')=}
-	{=$randomfloat(_callback:'text')=}
-	{=$randomfloat(_callback:'text')=}
-	{=$randomfloat(_callback:'text')=}
-	{=$randomfloat(_callback:'text')=}
-	{=$randomfloat(_callback:'text')=}
+	{=target=}
+	{% 
+		autoUpdate =(obj, text)->
+			console.log obj
+			if obj
+				$(obj._where).set('text',obj._data)
+			$randomfloat callback:autoUpdate, where:target
+		autoUpdate()
+	%}
 </body>
 </html>
