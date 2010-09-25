@@ -1,1 +1,4 @@
-this.$datatoprint = (data) -> {data: "Server speaking", callback: "insert", where: "data.where"}
+this.$datatoprint = (query) ->
+	"Server speaking: no info about query '#{query}'"
+
+this.$randomfloat = Math.random

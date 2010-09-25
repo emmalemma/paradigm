@@ -21,3 +21,6 @@ much later:
     - uses paperboy to serve static files
     - ...
 - hold template files in memory (maybe?), remove paperboy except in dev
+
+always:
+- search project for TODO, I forget sometimes
