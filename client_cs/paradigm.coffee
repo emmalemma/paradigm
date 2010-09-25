@@ -55,8 +55,6 @@ append =(data)-> console.log "Append:"+data
 remove =(data)-> console.log "Remove:"+data
 
 $_callback = (obj, text) ->
-	console.log "Callback:"
-	console.log obj
 	if obj._callback
 		window[obj._callback](obj)
 	
@@ -64,5 +62,4 @@ routed_functions = {%ROUTED_FUNCS%}
 
 for f in routed_functions
 	window[f] = (args...) ->
-		console.log args
 		$_call("#{f}", args...)

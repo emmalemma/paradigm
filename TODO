@@ -1,15 +1,15 @@
 To do:
 
 now:
-- client side templating
++ client side templating
 - DB support: client and server interfaces. Couch to start?
 - break config out into external file
 
 later:
 - minify JS being sent to the client (try UglifyJS, is node and we like node)
-- recursive template parsing
++ recursive template parsing
 - saying "Done!" is massively deceptive
-- use coffeescript compiler library for compilation instead of command-line
+/ use coffeescript compiler library for compilation instead of command-line
 
 much later:
 - parse template files for shared functions

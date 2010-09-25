@@ -17,6 +17,9 @@ Config =
 	client_cs_dir: path.join path.dirname(__filename), 'example/private/cs/'
 	client_js_dir: path.join path.dirname(__filename), 'example/public/js/'
 	server_code: "./example/secret"
+	database:
+		adapter: 'couchdb'
+		host: 'localhost'
 
 #GLOBALS
 

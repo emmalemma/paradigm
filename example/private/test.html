@@ -7,10 +7,9 @@
 	{=target=}
 	{% 
 		autoUpdate =(obj, text)->
-			console.log obj
 			if obj
 				$(obj._where).set('text',obj._data)
-			$randomfloat callback:autoUpdate, where:target
+			$randomfloat callback:autoUpdate, where:$('target')
 		autoUpdate()
 	%}
 </body>

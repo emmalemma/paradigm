@@ -48,23 +48,30 @@ watch_file =(file)->
 		
 	fs.stat file, handle_stats
 	
+	
+child_proc = null
 
 reboot =(file)->
 	sys.log "Modification detected in #{file}. Restarting process." if POLL_TIMEOUT #hack to only print this after the first process is running
-	child_proc.kill() if (child_proc and child_proc.pid)
+	if (child_proc and child_proc.pid)
+		child_proc.kill() 
+		child_proc = null
+	else
+		spawn_proc()
 	
 	
-child_proc = null
 spawn_proc=->
+	return if (child_proc and child_proc.pid)
 	child_proc = cp.spawn PROCESS, ARGS
 	child_proc.on 'exit', handle_exit
 	child_proc.stdout.on 'data', (data)->sys.print data if data
 	child_proc.stderr.on 'data', (data)->sys.print data if data
+	
 handle_exit=(code, signal)->
 	if signal == "SIGTERM"
 		spawn_proc()
 	else
-		console.log "Process exited with code #{code}"
+		child_proc = null
 		
 process.addListener "SIGTERM", ->
 	console.log "killing proc"
@@ -80,15 +87,16 @@ first_spawn =->
 
 IGNORE = [	'.git'
 			'example/public'
+			'watcher.coffee' #kinda pointless, since it won't restart itself
 			/^\..+/
 			/\.tmp$/
-		]
+			]
 
 VERBOSE = no
 
 PROCESS = "coffee"
 ARGS = ["paradigm.coffee"]
-TIMEOUT = 500
+TIMEOUT = 300
   
 first_spawn()
 watch_dir '.'
