@@ -17,9 +17,11 @@ Config =
 	client_cs_dir: path.join path.dirname(__filename), 'example/private/cs/'
 	client_js_dir: path.join path.dirname(__filename), 'example/public/js/'
 	server_code: "./example/secret"
-	database:
+	db:
 		adapter: 'couchdb'
 		host: 'localhost'
+		port: 5984
+		name: 'test_app' #unused ATM
 
 #GLOBALS
 
@@ -83,12 +85,18 @@ parse_templates =->
 					# 	data = data.replace "{=", "<div id='#{k}'></div>{%_where='#{k}'\n"
 					# data = data.replace /=}/g, "%}"
 					
-					
+					#TODO: DRY this (or rather redo the whole templating system)
 					blocks = data.split("{%")
 					code = ""
 					for block in blocks
 						[a,b] = block.split "%}"
 						code += ("<script>#{unwrapped_cs(a)}</script>#{b}" if b) or a
+						
+					blocks = code.split("{$")
+					code = ""
+					for block in blocks
+						[a,b] = block.split "$}"
+						code += ("<script>#{domready_cs(a)}</script>#{b}" if b) or a
 					fs.writeFile path.join(Config.public_dir, dir, f), code, 'utf8', (err)->log err if err
 					
 					
@@ -101,10 +109,32 @@ unwrapped_cs = (code) ->
 	out = matcher.exec(coffee.CoffeeScript.compile(code))
 	out[1]
 	
-server = http.createServer (req, res) ->
-	ip = req.connection.remoteAddress
-	if not route_function_call(req, res)
-		deliver_paperboy req, res, ip
+domready_cs =(code)->
+	unwrapped_cs "window.addEvent 'domready', ->
+		#{code}"
+	
+db_client = http.createClient(Config.db.port, Config.db.host)
+route_db_access =(req, res)->
+	if req.url[0..4] != "/$db/"
+		return false
+	
+	sys.log "Passing through #{req.method} #{req.url} to db"
+	
+	db_req = db_client.request 	req.method,
+								req.url.match(/\/\$db(.+)/)[1],
+								req.headers						
+	db_req.on 'response', (db_res) ->
+										res.writeHead 	db_res.statusCode,
+														db_res.headers
+										db_res.on 'data', (data)->
+																	res.end(data)
+	if req.method != "GET"
+		req.on 'data', (data)->
+								db_req.end(data)
+	else
+		db_req.end()
+															
+	return true
 
 route_function_call = (req, res) ->
 	if req.url[0..2] != "/$/"
@@ -112,7 +142,7 @@ route_function_call = (req, res) ->
 	
 	fname = "$#{req.url[3..]}"
 	
-	log "Received call for #{fname}..."
+	sys.log "Routing call for #{fname}"
 	
 	if fname of routed_funcs
 		rfunc = routed_funcs[fname]
@@ -140,25 +170,31 @@ route_function_call = (req, res) ->
 		
 	return true
   
-deliver_paperboy = (req, res, ip) -> 
+deliver_paperboy = (req, res) -> 
+	ip = req.connection.remoteAddress
+	
 	pb = paperboy.deliver(Config.public_dir, req, res)
 	pb = pb.addHeader 'Expires', 300
 	pb = pb.addHeader 'X-PaperRoute', 'Node'
-	pb = pb.before () -> sys.log 'Received Request'
-	pb = pb.after (statCode) -> log statCode, req.url, ip
+	pb = pb.before () -> sys.log "Serving static file for #{req.url}..."
+	pb = pb.after (statCode) -> sys.log statCode
 	pb = pb.error (statCode,msg) ->
 			res.writeHead(statCode, {'Content-Type': 'text/plain'})
 			res.end()
-			log(statCode, req.url, ip, msg)
+			sys.log statCode
 	pb = pb.otherwise (err) ->
 			statCode = 404;
 			res.writeHead(statCode, {'Content-Type': 'text/plain'})
 			res.end()
-			log(statCode, req.url, ip, err)
+			sys.log statCode
 			
 
 issue = (file) ->
 	cp.exec("cp #{file} #{path.join Config.client_js_dir, path.basename(file)}")
+
+server = http.createServer (req, res) ->
+	if not (route_function_call(req, res) or route_db_access(req, res))
+		deliver_paperboy req, res
 
 route_shared_functions()
 compile_clientside_scripts()

@@ -9,8 +9,22 @@
 		autoUpdate =(obj, text)->
 			if obj
 				$(obj._where).set('text',obj._data)
-			$randomfloat callback:autoUpdate, where:$('target')
+			#setTimeout (->$randomfloat callback:autoUpdate, where:$('target')),1000
 		autoUpdate()
 	%}
+	Enter your email: <input id="email_field" type="text"></input>
+	{%
+		class User extends Model
+			collection: "users"
+			
+		update_this_user =(fields...)->
+			new User("XXXa").set(fields[fields.length-1], console.log)
+	%}
+	{$	
+		console.log "dom ready"
+		$('email_field').set 'value', 'test'
+		$('email_field').addEvent 'change',(event)-> update_this_user(email:event.target.value)
+	$}
+	
 </body>
 </html>

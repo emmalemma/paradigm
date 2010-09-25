@@ -1,5 +1,30 @@
 #TODO: I have no memory of what I was going to write here.
-
+#-- DATABASE --#
+#for couchdb (client-side)
+class Model	
+	constructor: (@id) -> 
+		@url = "$db/#{@collection}/#{@id}"
+		
+		options =
+			url: @url
+			headers:
+				'Content-Type': "application/json"
+			urlEncoded: no
+			emulation: no
+			
+		@request = new Request.JSON options
+		
+	set: (fields, callback) ->
+		@request.onSuccess = callback
+		@request.put(JSON.stringify(fields))
+		console.log @request
+		
+	get:(callback)->
+		@request.onSuccess = callback
+		@request.get()
+		
+		
+#-- FUNCTION ROUTING --#
 $_call = (function_name, args...) ->
 	request = new Request.JSON(
 							{url:'/$/'+function_name[1..], 
@@ -26,6 +51,7 @@ $_call = (function_name, args...) ->
 	else 
 		return request.get()
 	request
+
 
 #TODO: garbage collect this (bleh)
 anon_funcs =
@@ -63,3 +89,4 @@ routed_functions = {%ROUTED_FUNCS%}
 for f in routed_functions
 	window[f] = (args...) ->
 		$_call("#{f}", args...)
+		
