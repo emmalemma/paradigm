@@ -4,6 +4,7 @@ http = require 'http'
 fs = require 'fs'
 cp = require 'child_process'
 
+coffee = require './lib/coffee-script'
 paperboy = require './lib/paperboy'
 
 #CONFIG
@@ -43,7 +44,7 @@ route_shared_functions =->
     fs.readFile 'client_cs/paradigm.coffee', 'utf8', (err, data) -> #this could also work better
         fout = data.replace("{%ROUTED_FUNCS%}", JSON.stringify(routed_funcs['$routed_functions']()))
         fs.writeFile 'client_cs/paradigm.tmp', fout, 'utf8', (err) ->
-            cp.exec "coffee -c -o #{CLIENT_JS_DIR} --no-wrap client_cs/paradigm.tmp"
+            cp.exec "coffee -c -o #{CLIENT_JS_DIR} --no-wrap client_cs/paradigm.tmp && rm client_cs/paradigm.tmp"
     log "Done!"
     
 compile_clientside_scripts =->
@@ -51,43 +52,41 @@ compile_clientside_scripts =->
     cp.exec "cd #{CLIENT_CS_DIR} && coffee -c -o #{CLIENT_JS_DIR} --no-wrap ."
     log "Done!"
     
-#TODO: make this recursive
-parse_templates =-> #please, god, refactor this
+parse_templates =->
     print "Parsing templates... "
-    fs.readdir PRIVATE_DIR, (err, files) ->
-        for f in files
-            code = ""
-            fs.readFile path.join(PRIVATE_DIR, f), 'utf8', (err, data) ->
-                if not data 
-                    return
-                blocks = data.split("{%")
-                slots = []
-                it = 0
+    parse_dir = (dir) ->
+        fs.readdir path.join(PRIVATE_DIR, dir), (err, files) ->
+            for f in files
+                code = ""
+                fs.readFile path.join(PRIVATE_DIR, dir, f), 'utf8', (err, data) ->
                 
-                done =->
-                    if undefined in slots
+                    fs.mkdir path.join(PUBLIC_DIR, dir), 493
+                
+                    if not data #this probably means it's a directory...
+                        return parse_dir path.join(dir, f)
+                        
+                    if not f.match /.*\.html/
                         return
-                    fout = slots.join('')
-                    fs.writeFile path.join(PUBLIC_DIR, f), fout, 'utf8'
+                        
+                    while data.match "{="
+                        data = data.replace "{=", "{%_where=#{((i+=1 if i) or i = 0).toString(16)}\n"
+                    data = data.replace /=}/g, "%}"
                     
-                for block in blocks
-                    [a,b] = block.split "%}"
-                    if b
-                        coffee = cp.spawn("coffee", ["-sp"])
-                        
-                        ij = it #have to break the reference... there must be a better way to do this
-                        coffee.stdout.on 'data', (data)->
-                            slots[ij] = "<script>"+data+"</script>"
-                            done()
-                        
-                        coffee.stdin.write a
-                        coffee.stdin.end()
-                        slots[it+1] = b
-                        it += 2
-                    else
-                        slots[it] = a
-                        it += 1
+                    blocks = data.split("{%")
+                    code = ""
+                    for block in blocks
+                        [a,b] = block.split "%}"
+                        code += ("<script>#{unwrapped_cs(a)}</script>#{b}" if b) or a
+                    fs.writeFile path.join(PUBLIC_DIR, dir, f), code, 'utf8', (err)->log err if err
+                    
+                    
+    parse_dir ''
     log "Done!"
+
+unwrapped_cs = (code) ->
+    matcher = /\(function\(\) {\n((.|\n)+)\n}\)\.call\(this\)\;\n/
+    out = matcher.exec(coffee.CoffeeScript.compile(code))
+    out[1]
     
 server = http.createServer (req, res) ->
     ip = req.connection.remoteAddress
@@ -99,6 +98,9 @@ route_function_call = (req, res) ->
         return false
     
     fname = "$#{req.url[3..]}"
+    
+    log "Received call for #{fname}..."
+    
     if fname of routed_funcs
         rfunc = routed_funcs[fname]
     else    

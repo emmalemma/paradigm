@@ -1,13 +1,31 @@
-$call = (function_name, args) -> jQuery.getJSON('/$/'+function_name[1..], JSON.stringify(args) if args.length, $callback)
+$_call = (function_name, args) ->
+    request = new Request.JSON(
+                            {url:'/$/'+function_name[1..], 
+                            onSuccess:$_callback
+                            })
+    console.log args
+    if args.length
+        request.send(JSON.stringify(args))
+    else
+        request.get()
+    request
 
-$callback = (data, status, request) ->
-    if data.callback
-        console.log data.callback
-        window[data.callback](data)
+$_callback = (obj, text) ->
+    if obj.callback
+        window[obj.callback](obj)
 
-insert =(data)-> console.log data
+$puthere = (f, args...) ->
+    console.log document.currentScript
+    f(args...)
+
+insert =(data)-> console.log "Insert:"+data
+update =(data)-> console.log "Update:"+data
+append =(data)-> console.log "Append:"+data
+remove =(data)-> console.log "Remove:"+data
 
 routed_functions = {%ROUTED_FUNCS%}
 
 for f in routed_functions
-    window[f] = (args...) -> $call("#{f}", args)
+    window[f] = (args...) ->
+        args.where = _where
+        $_call("#{f}", args)
