@@ -35,7 +35,8 @@ watch_file =(file)->
 			
 	log "Watching #{file}"
 	handle_stats = poll (err, stats) ->
-		#console.log "Handling #{file}"
+		if err
+			return sys.log "Watcher error: #{err}"
 		if stats.isDirectory()
 			return watch_dir file
 		
