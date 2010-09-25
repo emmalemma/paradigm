@@ -6,6 +6,7 @@ now:
 - break config out into external file
 
 later:
+- print errors from compiling client-side scripts
 - minify JS being sent to the client (try UglifyJS, is node and we like node)
 + recursive template parsing
 - saying "Done!" is massively deceptive
