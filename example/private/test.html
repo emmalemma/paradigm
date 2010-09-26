@@ -4,6 +4,24 @@
 <script src="js/paradigm.js"> </script>
 </head>
 <body> 
+	<input id="session_field" type="text"></input>
+	{%	
+		_sessid = null
+		current_user = null
+		set_user =(data)->
+			current_user = data
+			if current_user
+				console.log current_user
+		if current_user = Cookie.read '_sessid'		
+			$get_current_user callback:set_user
+		else
+			$get_sessid callback:(id)->
+				Cookie.write '_sessid', id
+				if not current_user
+					$get_current_user callback:set_user
+				
+			
+	%}
 	{=target=}
 	{% 
 		autoUpdate =(obj, text)->
@@ -13,15 +31,7 @@
 		autoUpdate()
 	%}
 	Enter your email: <input id="email_field" type="text"></input>
-	{%
-		class User extends Model
-			collection: "users"
-			
-		update_this_user =(fields...)->
-			new User("XXXa").set(fields[fields.length-1], console.log)
-	%}
 	{$	
-		console.log "dom ready"
 		$('email_field').set 'value', 'test'
 		$('email_field').addEvent 'change',(event)-> update_this_user(email:event.target.value)
 	$}

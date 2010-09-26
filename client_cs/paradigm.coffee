@@ -1,4 +1,5 @@
 #TODO: I have no memory of what I was going to write here.
+	
 #-- DATABASE --#
 #for couchdb (client-side)
 class Model	
@@ -82,7 +83,7 @@ remove =(data)-> console.log "Remove:"+data
 
 $_callback = (obj, text) ->
 	if obj._callback
-		window[obj._callback](obj)
+		window[obj._callback].bind(obj)(obj._data)
 	
 routed_functions = {%ROUTED_FUNCS%}
 

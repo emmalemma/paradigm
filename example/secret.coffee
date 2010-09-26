@@ -1,4 +1,7 @@
-this.$datatoprint = (query) ->
-	"Server speaking: no info about query '#{query}'"
+_db = require '../adapters/couchdb'
 
-this.$randomfloat = Math.random
+@$datatoprint = (query) ->
+	"Server speaking: no info about query '#{query}'"
+	
+@$get_current_user =->
+	console.log @Users.by_sessid({key:@_sessid}, @respond)
