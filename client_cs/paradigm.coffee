@@ -18,7 +18,6 @@ class Model
 	set: (fields, callback) ->
 		@request.onSuccess = callback
 		@request.put(JSON.stringify(fields))
-		console.log @request
 		
 	get:(callback)->
 		@request.onSuccess = callback
@@ -31,7 +30,7 @@ $_call = (function_name, args...) ->
 							{url:'/$/'+function_name[1..], 
 							onSuccess:$_callback
 							})	
-	console.log args
+							
 	if args.length > 0
 		kwargs = args.pop()
 		if typeof kwargs.callback == "function"

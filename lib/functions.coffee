@@ -34,7 +34,7 @@ routed_funcs = []
 		else
 			value = rfunc(parsed_data)
 			
-		if value
+		if value != undefined
 			@respond value
 	if req.method == "POST"
 		req.on 'data', finish
