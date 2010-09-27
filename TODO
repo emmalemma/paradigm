@@ -2,7 +2,6 @@ To do:
 
 now:
 + client side templating
-- DB support: client and server interfaces. Couch to start?
 - break config out into external file
 
 later:
@@ -11,11 +10,15 @@ later:
 + recursive template parsing
 - saying "Done!" is massively deceptive
 / use coffeescript compiler library for compilation instead of command-line
++ DB support: client and server interfaces. Couch to start?
+	- authentication layer for client-side db calls
+- switch from using binding to globals
+- look in ~/node-packages, that's a thing
 
 much later:
 - parse template files for shared functions
 - add a dev environment that:
-    - watches the server files and reloads them automatically
+    + watches the server files and reloads them automatically
     - issues a client-side hook that watches the server for updates and refreshes
     - doesn't compile client-side code, issues a client-side cs compiler instead
     - (or just doesn't minify)

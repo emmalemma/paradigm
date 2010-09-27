@@ -1,6 +1,6 @@
 fs = require 'fs'
 path = require 'path'
-coffee = require '../ext/coffee-script'
+coffee = ext 'coffee-script'
 
 #TODO: figure out how to make the compiler not do this
 unwrapped_cs = (code) ->

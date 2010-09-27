@@ -1,6 +1,7 @@
 fs = require 'fs'
 
 client = require './clientside'
+cookie = ext 'cookie-node'
 
 routed_funcs = []
 
@@ -25,13 +26,16 @@ routed_funcs = []
 	
 	finish =(data)=> 
 		parsed_data = JSON.parse(data or '{}')
+		console.log parsed_data
 		@respond =(data)-> res.end JSON.stringify( {_data: data or null, _callback: parsed_data._callback or null, _where: parsed_data._where or null })
 		rfunc = rfunc.bind this
-		if parsed_data._fargs #compiler limitation?
-			@respond rfunc(parsed_data._fargs..., parsed_data._data...)
+		if parsed_data._fargs #refactor me!
+			value = rfunc(parsed_data._fargs..., parsed_data)
 		else
-			@respond rfunc(parsed_data._data...)
-		
+			value = rfunc(parsed_data)
+			
+		if value
+			@respond value
 	if req.method == "POST"
 		req.on 'data', finish
 		
@@ -43,7 +47,7 @@ routed_funcs = []
 @route =(name, func)-> routed_funcs[name] = func
 
 @route_shared_functions =()->
-	server_code = require '../'+@Config.server_code
+	server_code = require @Config.server_code
 	console.log "Routing shared functions..."
 	for i of server_code
 		if i[0] == '$'

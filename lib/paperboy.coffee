@@ -2,7 +2,7 @@ sys = require 'sys'
 path = require 'path'
 fs = require 'fs'
 
-paperboy = require '../ext/paperboy'
+paperboy = ext 'paperboy'
 
 this.deliver = (req, res) -> 
 	ip = req.connection.remoteAddress
@@ -14,10 +14,10 @@ this.deliver = (req, res) ->
 	pb = pb.after (statCode) -> sys.log statCode
 	pb = pb.error (statCode,msg) ->
 			res.writeHead(statCode, {'Content-Type': 'text/plain'})
-			res.end()
+			res.end("An error occurred.")
 			sys.log statCode
 	pb = pb.otherwise (err) ->
 			statCode = 404;
 			res.writeHead(statCode, {'Content-Type': 'text/plain'})
-			res.end()
+			res.end("File not found.")
 			sys.log statCode

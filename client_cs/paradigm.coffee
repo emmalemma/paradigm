@@ -31,9 +31,9 @@ $_call = (function_name, args...) ->
 							{url:'/$/'+function_name[1..], 
 							onSuccess:$_callback
 							})	
+	console.log args
 	if args.length > 0
 		kwargs = args.pop()
-		
 		if typeof kwargs.callback == "function"
 			kwargs._callback = anon_func(kwargs.callback)
 		else if typeof kwargs.callback == "string"
@@ -59,14 +59,15 @@ anon_funcs =
 	count: 0
 	
 anon_func = (f) ->
-	for fname of anon_funcs
-		if anon_funcs[fname] == f
+	for fname of anon_funcs #just in case
+		if anon_funcs[fname] == null or anon_funcs[fname] == f
 			k = fname
 			break
-		
+			
 	if not k
 		k = "_F#{(anon_funcs.count+=1).toString(36)}"
-		anon_funcs[k] = window[k] = f
+		
+	anon_funcs[k] = window[k] = f
 		
 	return k
 
@@ -76,14 +77,11 @@ anon_el = (el) ->
 	el.id = k
 	return k
 
-text =(data)-> $(data._where).set('text',data._data)
-update =(data)-> console.log "Update:"+data
-append =(data)-> console.log "Append:"+data
-remove =(data)-> console.log "Remove:"+data
-
 $_callback = (obj, text) ->
 	if obj._callback
 		window[obj._callback].bind(obj)(obj._data)
+		if obj._callback of anon_funcs
+			anon_funcs[obj._callback] = null
 	
 routed_functions = {%ROUTED_FUNCS%}
 

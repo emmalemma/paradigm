@@ -1,26 +1,16 @@
 @initialize =()->
 	http = require 'http'
-	couchdb = require '../../ext/couchdb'
+	couchdb = ext 'couchdb'
 
 	@db =
 		toQuery: couchdb.toQuery
 		toJSON: couchdb.toJSON
 		client: couchdb.createClient(@Config.db.port, @Config.db.host)
 		
-	@build_views.bind(this)()
+	build_views.bind(this)()
 
-class Model	
-	constructor: (@id) -> 
-		@db = this.client.db(@collection)
-
-	set: (fields, callback) ->
-		@db.saveDoc(@id, fields, callback)
-
-	get:(callback)->
-		@db.getDoc(@id, fields, callback)
-
-@build_views =()->
-	designs = require '../'+@Config.db.views
+build_views =()->
+	designs = require @Config.db.views
 	for name of designs
 		design = designs[name]
 		db = @db.client.db(name.toLowerCase())
@@ -32,10 +22,9 @@ class Model
 																						@log "Error saving design:"
 																						@log err
 		design_name = design._id.match(/_design\/(.+)/)[1]
-		this[name] = {}
+		this[name] = db
 		for view of design.views
 			this[name][view] =(query, cb)=> db.view(design_name, view, query, cb)
-		console.log @Users.by_sessid
 																			
 
 db_client = null
