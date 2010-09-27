@@ -1,0 +1,55 @@
+<html>
+<head>
+<script src='js/mootools.js'> </script>
+<script src='js/mootools-more.js'> </script>
+<script src="js/paradigm.js"> </script>
+</head>
+<body> 
+	<input id="session_field" type="text"></input>
+	{%	
+		_sessid = null
+		current_user = null
+
+		set_user =(data)->
+			if current_user = data
+				console.log current_user
+			else
+				window.addEvent 'domready', (event)=>
+					$("signup").show()
+		if current_user = Cookie.read '_sessid'		
+			$get_current_user callback:set_user
+			
+		else
+			$get_sessid callback:(id)->
+				Cookie.write '_sessid', id
+				if not current_user
+					$get_current_user callback:set_user
+				
+			
+	%}
+	<div id="flash"></div>
+	<div id="signup" style="display:none;">
+	Enter your email: <input id="email_field" type="text"></input><div id="email_flash" style="display:inline"></div>
+	<br />
+	Enter some facts about you: <input id="facts" type="textarea"></input>
+	<input type="submit" id="savebutton" value="Sign up!"></input>
+	{%
+		$("email_field").addEvent 'keydown', (event)->
+												$('email_flash').hide()
+												showflash =(res)->$('flash').show('inline').set('text',res.flash)
+												$validate_user_email event.target.value, callback:showflash
+												
+		$("savebutton").addEvent 'click', (event)->
+													
+													$('flash').hide()
+													$save_new_user email:$('email_field').value, 
+																	facts:$('facts').value,
+																	callback:(resp)->
+																					if resp.success
+																						$('signup').hide()
+																					else
+																						$('flash').show().set('text', resp.error)
+	%}
+	</div>
+</body>
+</html>
