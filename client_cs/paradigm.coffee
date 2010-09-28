@@ -52,7 +52,6 @@ $_call = (function_name, args...) ->
 	request
 
 
-#TODO: garbage collect this (bleh)
 anon_funcs =
 	count: 0
 	

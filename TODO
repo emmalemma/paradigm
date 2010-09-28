@@ -2,7 +2,6 @@ To do:
 
 now:
 - switch from using binding to globals-- @ should be request context
-- move sessions stuff into middleware, build middleware system
 
 later:
 - print errors from compiling client-side scripts

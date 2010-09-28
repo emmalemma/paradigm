@@ -2,48 +2,44 @@
 #doesn't catch creating directories... low priority since an
 #empty directory is usually not an interesting event
 
-@Run = (Config) =>
-	sys = require 'sys'
-	fs = require 'fs'
-	path = require 'path'
-	cp = require 'child_process'
-	
-	log =(args...)->(console.log args...) if Config.verbose
+sys = require 'sys'
+fs = require 'fs'
+path = require 'path'
+cp = require 'child_process'
 
+@Run = (Config) =>
+	
 	watched_files = []
 
-	poll_timeout = 0
-	poll = (f) ->
-		(args...) ->
-			setTimeout f, Config.timeout, args...
+	poll = (f) -> (args...) -> setTimeout f, Config.timeout, args...
+
+	log =(args...)->(console.log args...) if Config.verbose
 		
 	watch_dir =(dir)->
 		fs.readdir dir, handle_files = (err, files) ->				
-			if err #directory was deleted, reboot it
-				return reboot(dir)
+			return reboot(dir) if err #directory was deleted, reboot it
+			
 			for f in files
 				fpath = path.join(dir, f)
 				if fpath not in watched_files
-					watched_files.push watch_file fpath, dir
+					watch_file fpath, dir
 			fs.readdir dir, poll handle_files
 						
 
 	watch_file =(file)->
+		watched_files.push file
 		for ig in Config.ignore
 			return log "Ignoring #{file}" if file.match ig or path.basename(file).match ig
 			
+		last = null
 		fs.stat file, handle_stats = (err, stats) ->
 			return reboot(file) if err #this probably means the file was deleted
-			return watch_dir file if stats.isDirectory()
-		
-			mtime = stats.mtime.toString()
+			return watch_dir file if stats.isDirectory()			
 			
-			if last? and last != mtime
-				reboot(file)
-			
+			reboot(file) if last != mtime = stats.mtime.toString()
 			last = mtime
+			
 			fs.stat file, poll handle_stats
-		log "Watching #{file}" and file
 		
 	child_proc = null
 
