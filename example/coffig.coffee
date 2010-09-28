@@ -1,4 +1,6 @@
 @Config = 
+	paradigm_version: "0.2.0"
+	
 	port: 8007
 	app_dir:		dir= '/path/to/example'
 	private_dir: 	path.join dir, 'private'

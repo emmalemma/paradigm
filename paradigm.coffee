@@ -16,8 +16,7 @@ SWITCHES = [
 
 fs = require 'fs'
 path = require 'path'
-
-global.$PARADIR = path.dirname(fs.realpathSync(__filename))
+global.$PARADIR = path.dirname(fs.realpathSync(__filename.split(" ")[0]))
 
 global.$EXTDIR = path.join($PARADIR, 'ext/');
 global.ext =(file)-> require path.join $EXTDIR, file
@@ -34,9 +33,14 @@ if not opts.arguments.length
 	return puts optionParser.help()
 else
 	config = loc opts.arguments[0]
-	if opts.watch
-		watcher = require path.join $PARADIR, 'watcher'
-		watcher.Run(config.Config.watcher)
+	if not (config and config.Config and config.Config.paradigm_version)
+	    return console.log "That coffig does not appear to be a paradigm config file."
+	else if opts.watch
+	    if config.Config.watcher
+    		watcher = require path.join $PARADIR, 'watcher'
+    		watcher.Run(config.Config.watcher)
+    	else
+    	    return console.log "That coffig does not have watcher settings."
 	else
 		server = require path.join $PARADIR, 'server'
 		server.Run(config.Config)

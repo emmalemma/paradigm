@@ -1,24 +1,21 @@
 To do:
 
 now:
-+ client side templating
-- break config out into external file
+- switch from using binding to globals-- @ should be request context
+- move sessions stuff into middleware, build middleware system
 
 later:
 - print errors from compiling client-side scripts
 - minify JS being sent to the client (try UglifyJS, is node and we like node)
-+ recursive template parsing
 - saying "Done!" is massively deceptive
-/ use coffeescript compiler library for compilation instead of command-line
-+ DB support: client and server interfaces. Couch to start?
-	- authentication layer for client-side db calls
-- switch from using binding to globals
-- look in ~/node-packages, that's a thing
++ DB support- authentication layer for client-side db calls
+- look into ~/node-packages, that's a thing
 
 much later:
+- function routing can be done by a middleware
+- figure out how to build unwrapped coffeescript
 - parse template files for shared functions
 - add a dev environment that:
-    + watches the server files and reloads them automatically
     - issues a client-side hook that watches the server for updates and refreshes
     - doesn't compile client-side code, issues a client-side cs compiler instead
     - (or just doesn't minify)

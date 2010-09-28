@@ -22,8 +22,7 @@ class Model
 	get:(callback)->
 		@request.onSuccess = callback
 		@request.get()
-		
-		
+
 #-- FUNCTION ROUTING --#
 $_call = (function_name, args...) ->
 	request = new Request.JSON(
@@ -88,3 +87,10 @@ for f in routed_functions
 	window[f] = (args...) ->
 		$_call("#{f}", args...)
 		
+		
+		
+#-- MIDDLEWARES --#
+Middlewares = {%MIDDLEWARES%}
+
+for ware in Middlewares
+	Asset.javascript("/js/middlewares/#{ware}.js")
