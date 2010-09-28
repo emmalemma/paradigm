@@ -3,7 +3,7 @@ fs = require 'fs'
 client = require './clientside'
 cookie = ext 'cookie-node'
 
-routed_funcs = []
+global.routed_funcs = []
 
 @route_function_call = (req, res) ->
 	if req.url[0..2] != "/$/"
@@ -20,10 +20,7 @@ routed_funcs = []
 		return res.end JSON.stringify({error: "No such call."})
 
 	res.writeHead 200, {'Content-Type': 'application/json'}	   
-	
-	@_sessid	= req.getCookie("_sessid")
-	@_ip 		= req.connection.remoteAddress
-	
+		
 	finish =(data)=> 
 		parsed_data = JSON.parse(data or '{}')
 		console.log parsed_data
@@ -44,7 +41,8 @@ routed_funcs = []
 		
 	return true
 
-@route =(name, func)-> routed_funcs[name] = func
+@route =(name, func)-> 
+	routed_funcs[name] = func
 
 @route_shared_functions =()->
 	server_code = require @Config.server_code

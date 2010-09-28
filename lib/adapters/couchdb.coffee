@@ -1,7 +1,6 @@
 @initialize =()->
 	http = require 'http'
 	couchdb = ext 'couchdb'
-
 	@db =
 		toQuery: couchdb.toQuery
 		toJSON: couchdb.toJSON
@@ -20,12 +19,12 @@ build_views =()->
 								db.saveDoc design._id, @db.toJSON(design), (err, doc) =>
 																					if err
 																						@log "Error saving design:"
-																						@log err
+																						console.log err
 		design_name = design._id.match(/_design\/(.+)/)[1]
 		this[name] = db
 		for view of design.views
 			this[name][view] =(query, cb)=> db.view(design_name, view, query, cb)
-																			
+
 
 db_client = null
 @route_db_access =(req, res)->

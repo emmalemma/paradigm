@@ -15,7 +15,7 @@ fs = require 'fs'
 	templates = require './lib/templates'
 
 	functions = require './lib/functions'
-	route = functions.route.bind(this)
+	@route = functions.route.bind(this)
 	
 	paperboy = require './lib/paperboy'
 
@@ -25,11 +25,17 @@ fs = require 'fs'
 	database = require "./lib/adapters/#{@Config.db.adapter}"
 
 	client = require './lib/clientside'
+	
+	middleware = require './lib/middleware'
 
-	route '$routed_functions', -> name for name of routed_funcs
-	route '$get_sessid' , -> @_sessid or Math.random().toString(36)
+	@route '$routed_functions', -> name for name of routed_funcs
 
 	server = http.createServer (req, res) =>
+		@Request = req
+		@Response = res
+		
+		middleware.before_every_request.bind(this)()
+				
 		if not (functions.route_function_call.bind(this)(req, res) or database.route_db_access.bind(this)(req, res))
 			paperboy.deliver.bind(this) req, res
 
@@ -40,6 +46,8 @@ fs = require 'fs'
 	templates.parse_templates.bind(this)()
 
 	database.initialize.bind(this)()
+
+	middleware.load_middlewares.bind(this)()
 
 
 	issue path.join $EXTDIR, 'mootools.js'

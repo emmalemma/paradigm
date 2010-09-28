@@ -18,7 +18,7 @@
 			setTimeout f, poll_timeout, args...
 		
 	watch_dir =(dir)->
-		handle_files = poll (err, files) ->
+		fs.readdir dir, handle_files = poll (err, files) ->
 			if err #directory was deleted, reboot it
 				return reboot(dir)
 			for f in files
@@ -27,9 +27,7 @@
 					watch_file fpath, dir
 				
 			fs.readdir dir, handle_files
-	
-		fs.readdir dir, handle_files
-			
+						
 
 	watch_file =(file)->
 		watched_files.push file
@@ -39,7 +37,7 @@
 				return log "Ignoring #{file}"
 			
 		log "Watching #{file}"
-		handle_stats = poll (err, stats) ->
+		fs.stat file, handle_stats = poll (err, stats) ->
 			if err #this probably means the file was deleted
 				return reboot(file)
 				
@@ -53,9 +51,6 @@
 			
 			fs.stat file, handle_stats
 		
-		fs.stat file, handle_stats
-	
-	
 	child_proc = null
 
 	reboot =(file)->

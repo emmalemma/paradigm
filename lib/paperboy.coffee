@@ -5,7 +5,7 @@ fs = require 'fs'
 paperboy = ext 'paperboy'
 
 this.deliver = (req, res) -> 
-	ip = req.connection.remoteAddress
+	ip = @Request.ip
 	
 	pb = paperboy.deliver(@Config.public_dir, req, res)
 	pb = pb.addHeader 'Expires', 300
