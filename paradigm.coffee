@@ -33,15 +33,15 @@ if not opts.arguments.length
 	return puts optionParser.help()
 else
 	config = loc opts.arguments[0]
-	if not (config and config.Config and config.Config.paradigm_version)
+	if not (config and config.App and config.App.paradigm_version)
 	    return console.log "That coffig does not appear to be a paradigm config file."
 	else if opts.watch
-	    if config.Config.watcher
+	    if config.Watcher
     		watcher = require path.join $PARADIR, 'watcher'
-    		watcher.Run(config.Config.watcher)
+    		watcher.Run(config.Watcher)
     	else
     	    return console.log "That coffig does not have watcher settings."
 	else
 		server = require path.join $PARADIR, 'server'
-		server.Run(config.Config)
+		server.Run(config.App)
 	
