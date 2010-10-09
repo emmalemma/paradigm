@@ -9,6 +9,8 @@ generate_session =()->
 	@Session =
 		id: @Request.getCookie("_sessid")
 		
+		clear: ()=> @Response.clearCookie("_sessid")
+		
 	if not @Session.id 		#or validate session, etc...
 		@log "Generating session..."
 		@Session.id = generate_session()
