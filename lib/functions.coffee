@@ -23,9 +23,11 @@ global.routed_funcs = []
 		
 	finish =(data)=> 
 		parsed_data = JSON.parse(data or '{}')
+		
 		console.log parsed_data
 		_callback = parsed_data._callback
 		delete parsed_data._callback
+		
 		@respond =(data)-> res.end JSON.stringify( {_data: data or null, _callback: _callback or null, _where: parsed_data._where or null })
 		rfunc = rfunc.bind this
 		if parsed_data._fargs #refactor me!
@@ -47,7 +49,12 @@ global.routed_funcs = []
 	routed_funcs[name] = func
 
 @route_shared_functions =()->
-	server_code = require @Config.server_code
+	try
+		server_code = require @Config.server_code
+	catch ex
+		ex.message = "In #{@Config.server_code}: "+ex.message
+		throw ex
+		
 	console.log "Routing shared functions..."
 	for i of server_code
 		if i[0] == '$'

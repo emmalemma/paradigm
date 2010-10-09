@@ -9,7 +9,12 @@ wrap =(str)-> "(#{str}).call(this);"
 	@Middlewares = {}
 	if @Config.middlewares?
 		for ware of @Config.middlewares
-			@Middlewares[ware] = require "./middlewares/#{ware}"
+			try
+				@Middlewares[ware] = require "./middlewares/#{ware}"
+			catch ex
+				ex.message =  "In middlewares/#{ware}: "+ex.message
+				throw ex
+				
 			@Middlewares[ware].initialize.bind(this)()
 			
 			if @Middlewares[ware].ClientSide and @Config.middlewares[ware].client != no

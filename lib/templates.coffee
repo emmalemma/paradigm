@@ -25,8 +25,10 @@ domready_cs =(code)->
 						if not data #this probably means it's a directory...
 							return parse_dir path.join(dir, f)
 						
-						if not f.match /.*\.html/
+						#todo this should be configurable
+						if not m = f.match /(.*)\.π/
 							return
+						partial_name = m[1]
 						
 						#match target tags (new way)
 						while m = data.match /{= *(.+) *=}/
@@ -61,7 +63,7 @@ domready_cs =(code)->
 							@log "Error in processing template #{f}:\n  #{error} (Really line #{lines+line_num})"
 							throw "TemplateProcessingError"
 							
-						fs.writeFile path.join(@Config.public_dir, dir, f), code, 'utf8', (err)->log err if err
+						fs.writeFile path.join(@Config.public_dir, dir, partial_name), code, 'utf8', (err)->log err if err
 				
 	parse_dir ''
 	@log "Done!"
