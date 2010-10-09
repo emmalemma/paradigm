@@ -24,7 +24,9 @@ global.routed_funcs = []
 	finish =(data)=> 
 		parsed_data = JSON.parse(data or '{}')
 		console.log parsed_data
-		@respond =(data)-> res.end JSON.stringify( {_data: data or null, _callback: parsed_data._callback or null, _where: parsed_data._where or null })
+		_callback = parsed_data._callback
+		delete parsed_data._callback
+		@respond =(data)-> res.end JSON.stringify( {_data: data or null, _callback: _callback or null, _where: parsed_data._where or null })
 		rfunc = rfunc.bind this
 		if parsed_data._fargs #refactor me!
 			value = rfunc(parsed_data._fargs..., parsed_data)
