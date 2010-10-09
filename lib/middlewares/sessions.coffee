@@ -15,5 +15,4 @@ generate_session =()->
 		@Response.setCookie("_sessid", @Session.id)
 		
 @ClientSide =->
-	@Session = new Element('div', "id":Cookie.read('_sessid'))
-	console.log "Session: #{@Session.id}"
+	@Session = {"id":Cookie.read('_sessid')}
