@@ -8,11 +8,16 @@
 		
 	build_views.bind(this)()
 
-build_views =()->
+build_views =()-> #todo this is fabulously ugly
 	designs = require @Config.db.views
 	for name of designs
 		design = designs[name]
 		db = @db.client.db(name.toLowerCase())
+		
+		#design.validate_doc_update = "$validate$"
+		#validate = @db.toJSON(validations).replace('$validate$', @db.toJSON(design.validate).replace(/^"|"$/g, ''))
+		#delete design.validate
+		
 		db.getDoc	design._id, (err, doc)=>
 								if not err
 									design._rev = doc._rev
@@ -24,7 +29,6 @@ build_views =()->
 		this[name] = db
 		for view of design.views
 			this[name][view] =(query, cb)=> db.view(design_name, view, query, cb)
-
 
 db_client = null
 @route_db_access =(req, res)->
@@ -51,3 +55,34 @@ db_client = null
 		db_req.end()
 															
 	return true
+
+$validate$ = console.log
+validations =(newDoc, oldDoc, userCtx)->
+		permitted_fields = ['_id', '_revisions']
+		permit =(field)-> permitted_fields.push(field) if field of newDoc
+	
+		require =(field, message)-> unless permit(field) and newDoc[field] != ''
+										throw(forbidden: message or "Document must have a #{field} field.")
+									
+		`var __hasProp = Object.prototype.hasOwnProperty;`
+		disallow_others =-> for field of newDoc
+								unless field in permitted_fields
+									throw (forbidden: message or "Attribute '#{field}' is not permitted.") 
+	
+		integer =(field, message)-> if (field of newDoc) and isNaN(parseInt(newDoc[field]))
+										throw (forbidden: message or "'#{field}' must be an integer.") 
+									else field
+	
+		email =(field, message)-> if (field of newDoc) and not newDoc[field].match(/\b[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b/i)
+										throw (forbidden: message or "'#{field}' must be a valid email address.") 
+									else field
+								
+		validate_type =(field, type)-> (field of newDoc) and typeof newDoc[field] == type
+	
+		string =(field, message)-> unless validate_type field, 'string'
+										throw (forbidden: message or "'#{field}' must be a string.") 
+									else field
+								
+		id_is =(func, field, message)-> func '_id', message
+		
+		($validate$).call()
