@@ -2,7 +2,7 @@ sys = require 'sys'
 path = require 'path'
 fs = require 'fs'
 
-paperboy = ext 'paperboy'
+paperboy = require 'paperboy'
 
 @handle_request =->
 	ip = @Request.ip

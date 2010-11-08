@@ -19,20 +19,19 @@ path = require 'path'
 global.$PARADIR = path.dirname(fs.realpathSync(__filename.split(" ")[0]))
 
 global.$EXTDIR = path.join($PARADIR, 'ext/');
-global.ext =(file)-> require path.join $EXTDIR, file
 
 global.$LOCDIR = fs.realpathSync('.')
 global.loc =(file)-> require path.join $LOCDIR, file
 
-optparse = ext 'optparse'
+optparse = require 'optparse'
 
 optionParser  = new optparse.OptionParser SWITCHES, BANNER
 opts = optionParser.parse process.argv
 
-if not opts.arguments.length
+if not opts.length
 	return puts optionParser.help()
 else
-	config = loc opts.arguments[0]
+	config = loc opts[0]
 	if not (config and config.App and config.App.paradigm_version)
 	    return console.log "That coffig does not appear to be a paradigm config file."
 	else if opts.watch

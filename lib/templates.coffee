@@ -1,11 +1,11 @@
 fs = require 'fs'
 path = require 'path'
-coffee = ext 'coffee-script'
+coffee = require 'coffee-script'
 
 #TODO: figure out how to make the compiler not do this
 unwrapped_cs = (code) ->
 	matcher = /\(function\(\) {\n((.|\n)*)\n}\)\.call\(this\)\;\n/
-	out = matcher.exec(coffee.CoffeeScript.compile(code))
+	out = matcher.exec(coffee.compile(code))
 	out[1]
 	
 domready_cs =(code)->

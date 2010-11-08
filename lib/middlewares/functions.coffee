@@ -1,6 +1,6 @@
 fs = require 'fs'
 
-cookie = ext 'cookie-node'
+cookie = require 'cookie'
 
 routed_funcs = []
 

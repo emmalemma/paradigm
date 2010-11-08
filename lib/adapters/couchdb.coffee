@@ -1,6 +1,6 @@
 @initialize =()->
 	http = require 'http'
-	couchdb = ext 'couchdb'
+	couchdb = require 'couchdb'
 	@db =
 		toQuery: couchdb.toQuery
 		toJSON: couchdb.toJSON

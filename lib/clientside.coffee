@@ -2,7 +2,7 @@ cp = require 'child_process'
 path = require 'path'
 fs = require 'fs'
 
-coffee = ext 'coffee-script'
+coffee = require 'coffee-script'
 
 @compile_clientside_scripts =()->
 	console.log "Compiling client-side coffeescripts into js... "
