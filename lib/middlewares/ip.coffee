@@ -1,3 +1,3 @@
 
-@before_every_request =()->
+@before_request =()->
 	@Request.ip = req.connection.remoteAddress

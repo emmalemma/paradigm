@@ -2,10 +2,10 @@
 generate_session =()->
 	Math.random().toString(36)
 	
-@initialize=()->
+@initialize=->
 	@route '$get_sessid' , -> @Session.id
 
-@before_every_request =()->
+@before_request =->
 	@Session =
 		id: @Request.getCookie("_sessid")
 		

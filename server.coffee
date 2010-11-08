@@ -14,11 +14,6 @@ fs = require 'fs'
 
 	templates = require './lib/templates'
 
-	functions = require './lib/functions'
-	@route = functions.route.bind(this)
-	
-	paperboy = require './lib/paperboy'
-
 	client = require './lib/clientside'
 	issue = client.issue.bind(this)
 
@@ -28,18 +23,13 @@ fs = require 'fs'
 	
 	middleware = require './lib/middleware'
 
-	@route '$routed_functions', -> name for name of routed_funcs
-
 	server = http.createServer (req, res) =>
 		@Request = req
 		@Response = res
 		
-		middleware.before_every_request.bind(this)()
-				
-		if not (functions.route_function_call.bind(this)(req, res) or database.route_db_access.bind(this)(req, res))
-			paperboy.deliver.bind(this) req, res
-
-	functions.route_shared_functions.bind(this)()
+		middleware.before_request.bind(this)()
+		middleware.handle_request.bind(this)()
+		middleware.after_request.bind(this)()
 
 	client.compile_clientside_scripts.bind(this)()
 
