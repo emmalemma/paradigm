@@ -26,6 +26,11 @@ global.loc =(file)-> require path.join $LOCDIR, file
 optparse = require 'optparse'
 
 optionParser  = new optparse.OptionParser SWITCHES, BANNER
+
+watch = no
+
+optionParser.on 'watch', (opts) => watch = yes
+
 opts = optionParser.parse process.argv
 
 if not opts.length
@@ -34,7 +39,7 @@ else
 	config = loc opts[0]
 	if not (config and config.App and config.App.paradigm_version)
 	    return console.log "That coffig does not appear to be a paradigm config file."
-	else if opts.watch
+	else if watch
 	    if config.Watcher
     		watcher = require path.join $PARADIR, 'watcher'
     		watcher.Run(config.Watcher)

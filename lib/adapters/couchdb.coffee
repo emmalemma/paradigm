@@ -10,6 +10,7 @@
 
 build_views =()-> #todo this is fabulously ugly
 	designs = require @Config.db.views
+	@Models = {}
 	for name of designs
 		design = designs[name]
 		db = @db.client.db(name.toLowerCase())
@@ -26,9 +27,9 @@ build_views =()-> #todo this is fabulously ugly
 																						@log "Error saving design:"
 																						console.log err
 		design_name = design._id.match(/_design\/(.+)/)[1]
-		this[name] = db
+		@Models[name] = db
 		for view of design.views
-			this[name][view] =(query, cb)=> db.view(design_name, view, query, cb)
+			@Models[name][view] =(query, cb)=> db.view(design_name, view, query, cb)
 
 db_client = null
 @route_db_access =(req, res)->

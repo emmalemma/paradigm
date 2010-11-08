@@ -21,3 +21,4 @@ paperboy = require 'paperboy'
 			@Response.writeHead(statCode, {'Content-Type': 'text/plain'})
 			@Response.end("File not found.")
 			@log statCode
+	true

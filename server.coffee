@@ -24,12 +24,19 @@ fs = require 'fs'
 	middleware = require './lib/middleware'
 
 	server = http.createServer (req, res) =>
-		@Request = req
-		@Response = res
-		
-		middleware.before_request.bind(this)()
-		middleware.handle_request.bind(this)()
-		middleware.after_request.bind(this)()
+		RequestContext = 
+						Middlewares: 	@Middlewares
+						Config:			@Config
+						Models:			@Models
+						
+						log:			sys.log
+						
+						Request: 	req
+						Response: 	res
+						
+		middleware.before_request.bind(RequestContext)()
+		middleware.handle_request.bind(RequestContext)()
+		middleware.after_request.bind(RequestContext)()
 
 	client.compile_clientside_scripts.bind(this)()
 

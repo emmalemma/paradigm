@@ -23,9 +23,9 @@ routed_funcs = []
 	finish =(data)=> 
 		parsed_data = JSON.parse(data or '{}')
 		
-		console.log parsed_data
-		
-		@respond =(data)=> @Response.end JSON.stringify( data )
+		@respond =(data)=> 
+						@Response.end JSON.stringify( data )
+						
 		rfunc = rfunc.bind this
 		if parsed_data._fargs #refactor me!
 			value = rfunc(parsed_data._fargs..., parsed_data)
