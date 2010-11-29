@@ -10,15 +10,15 @@ paperboy = require 'paperboy'
 	pb = paperboy.deliver(@Config.public_dir, @Request, @Response)
 	pb = pb.addHeader 'Expires', 300
 	pb = pb.addHeader 'X-PaperRoute', 'Node'
-	pb = pb.before () => @log "Serving static file for #{@Request.url}..."
-	pb = pb.after (statCode) => @log statCode
+	#pb = pb.before () => #@log "Serving static file for #{@Request.url}..."
+	pb = pb.after (statCode) => @log "PB-Served #{@Request.url}: #{statCode}"
 	pb = pb.error (statCode,msg) =>
 			@Response.writeHead(statCode, {'Content-Type': 'text/plain'})
 			@Response.end("An error occurred.")
-			@log statCode
+			@log "PB-Error serving #{@Request.url}: #{statCode}"
 	pb = pb.otherwise (err) =>
 			statCode = 404;
 			@Response.writeHead(statCode, {'Content-Type': 'text/plain'})
 			@Response.end("File not found.")
-			@log statCode
+			@log "PB-#{@Request.url}: #{statCode}"
 	true

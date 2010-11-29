@@ -10,7 +10,7 @@ routed_funcs = []
 	
 	fname = m[1]
 	
-	@log "Routing call for #{fname}"
+	@log "FUNC-Routing call for #{fname}"
 	
 	if fname of routed_funcs
 		rfunc = routed_funcs[fname]

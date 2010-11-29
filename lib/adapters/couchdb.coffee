@@ -121,5 +121,5 @@ validations =(newDoc, oldDoc, userCtx)->
 				throw forbidden: "#{field} must be a #{name}. (#{subkey} #{submessage})"
 			field
 		
-		($validate$).apply(null, [newDoc, oldDoc, userCtx])
+		($validate$)(newDoc, oldDoc, userCtx)
 		
