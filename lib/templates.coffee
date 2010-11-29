@@ -17,7 +17,8 @@ domready_cs =(code)->
 	parse_dir = (dir) =>
 		fs.readdir path.join(@Config.private_dir, dir), (err, files) =>
 			for f in files
-					code = ""
+				code = ""
+				unless f.match(/^\./) 
 					fs.readFile path.join(@Config.private_dir, dir, f), 'utf8', (err, data) =>
 				
 						fs.mkdir path.join(@Config.public_dir, dir), 493
