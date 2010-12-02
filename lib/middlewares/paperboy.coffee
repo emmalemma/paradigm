@@ -4,6 +4,11 @@ fs = require 'fs'
 
 paperboy = require 'paperboy'
 
+@initialize =->
+	for type of @Config.middlewares.paperboy.mimetypes
+		console.log "adding type #{type}"
+		paperboy.contentTypes[type] = @Config.middlewares.paperboy.mimetypes[type]
+
 @handle_request =->
 	ip = @Request.ip
 	
