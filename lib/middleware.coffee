@@ -21,10 +21,17 @@ wrap =(str)-> "(#{str}).call(this);"
 				fs.writeFile path.join(@Config.client_js_dir, "middlewares/#{ware}.js"), code, "utf8", (err)->console.log "Error writing middlewares/#{ware}.js: #{err}" if err
 	
 	
-	ClientSide =->
-		Middlewares = $MIDDLEWARES$
-		for ware in Middlewares
-			Asset.javascript("/js/middlewares/#{ware}.js") if ware
+	if @Config.client_lib == "mootools"
+		ClientSide =->
+			Middlewares = $MIDDLEWARES$
+			for ware in Middlewares
+				Asset.javascript("/js/middlewares/#{ware}.js") if ware		
+	else if @Config.client_lib == "jquery"
+		ClientSide =->
+			Middlewares = $MIDDLEWARES$
+			for ware in Middlewares
+				$.getScript("/js/middlewares/#{ware}.js") if ware
+	
 			
 	code = wrap(ClientSide.toString()).replace '$MIDDLEWARES$', JSON.stringify((ware if @Config.middlewares[ware].client) for ware of @Middlewares)
 	fs.writeFile path.join(@Config.client_js_dir, "middlewares/init.js"), code, "utf8", (err)->console.log "Error writing middlewares/#{ware}.js: #{err}" if err

@@ -46,9 +46,9 @@ fs = require 'fs'
 
 	middleware.load_middlewares.bind(this)()
 
-
-	issue path.join $EXTDIR, 'mootools.js'
-	issue path.join $EXTDIR, 'mootools-more.js'
+	# 
+	# issue path.join $EXTDIR, 'mootools.js'
+	# issue path.join $EXTDIR, 'mootools-more.js'
 
 	print "Starting listener on port #{@Config.port}... "
 	server.listen @Config.port
