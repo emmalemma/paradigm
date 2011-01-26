@@ -4,7 +4,7 @@ coffee = require 'coffee-script'
 
 #TODO: figure out how to make the compiler not do this
 unwrapped_cs = (code) ->
-	matcher = /\(function\(\) {\n((.|\n)*)\n}\)\.call\(this\)\;\n/
+	matcher = /^\(function\(\) {\n((.|\n)*)\n}\)\.call\(this\)\;\n$/
 	out = matcher.exec(coffee.compile(code))
 	out[1]
 	
@@ -60,7 +60,10 @@ domready_cs =(code)->
 								lines += block.split('\n').length - 1
 								
 						catch error
-							line_num = parseInt(error.message.match(/line (\d+):/)[1])
+							line_num = -1
+							m = error.message.match(/line (\d+):/)
+							if m
+								line_num = parseInt(m[1])
 							@log "Error in processing template #{f}:\n  #{error} (Really line #{lines+line_num})"
 							throw "TemplateProcessingError"
 							
